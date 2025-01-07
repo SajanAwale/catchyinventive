@@ -12,3 +12,7 @@ Route::get('/admin/login',[AdminLoginController::class,'index'])->name('admin.lo
 Route::post('/admin/authenticate',[AdminLoginController::class,'authenticate'])->name('admin.authenticate');
 
 Route::get('/admin/dashboard',[DashboardController::class,'index'])->name('admin.dashboard');
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
