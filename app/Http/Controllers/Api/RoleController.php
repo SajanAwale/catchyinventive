@@ -35,7 +35,6 @@ class RoleController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'name' => 'required|string|max:255',
         ]);
-
         $role = $request->user()->Role()->create($request);
         return ['role' => $role];
     }

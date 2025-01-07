@@ -16,14 +16,14 @@ Route::post('/login ', [AuthController::class, 'login']);
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::group([
-  'prefix' => 'v1',
-  'as' => 'api.',
-  'namespace' => 'Api\V1\Admin',
-  'middleware' => ['auth:sanctum']
-], function (){
-  Route::apiResource('projects', 'ProjectsApiController');
-});
+// Route::group([
+//   'prefix' => 'v1',
+//   'as' => 'api.',
+//   'namespace' => 'Api\V1\Admin',
+//   'middleware' => ['auth:sanctum']
+// ], function (){
+//   Route::apiResource('projects', 'ProjectsApiController');
+// });
 
 // Route::get('/', function () {
     
