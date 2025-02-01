@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,9 +27,18 @@ Route::get('/user', function (Request $request) {
  */
 Route::controller(AuthController::class)
   ->prefix('v1/auth')
-
   ->group(function () {
     Route::post('/register', 'registerAdminUser');
     Route::post('/login', 'login');
     Route::post('/logout', 'logout')->middleware(['auth:sanctum']);
+  });
+
+Route::controller(BrandController::class)
+  ->prefix('v1/brand')
+  ->group(function () {
+    Route::get('/', 'index');
+    Route::post('/store', 'store');
+    Route::get('/show/{brand}', 'show');
+    Route::put('/update/{brand}', 'update');
+    Route::delete('/destroy/{brand}', 'destroy');
   });
