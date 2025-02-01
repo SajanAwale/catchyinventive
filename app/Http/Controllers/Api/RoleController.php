@@ -24,7 +24,11 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return Role::all();
+        try {
+            return Role::all();
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error occurred while fetching roles', 'error' => $e->getMessage()], 403);
+        }
     }
 
     /**
@@ -32,11 +36,16 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        $fields = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-        $role = $request->user()->Role()->create($request);
-        return ['role' => $role];
+        try {
+            $fields = $request->validate([
+                'name' => 'required|string|max:255',
+            ]);
+            $role = Role::create($fields);
+            return response()->json(['role' => $role], 201); // Return with a 201 Created status
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error occurred while validating the request', 'error' => $e->getMessage()], 403);
+        }
     }
 
     /**
@@ -44,28 +53,40 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function show(Role $role)
     {
-        return $role;
+        try {
+            return $role;
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error occurred while fetching the role', 'error' => $e->getMessage()], 403);
+        }
     }
-
+    
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Role $role)
     {
-        $request = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        try {
+            $fields = $request->validate([
+                'name' => 'required|string|max:255',
+            ]);
+            $role->update($fields);
+            return response()->json($role, 200); // Return with a 200 OK status
 
-        $role->update($request);
-        return  $role;
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error occurred while updating the role', 'error' => $e->getMessage()], 403);
+        }
     }
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Role $role)
     {
-        $role->delete();
-        return ['message' => 'The post was Deleted.'];
+        try {
+            $role->delete();
+            return response()->json(['message' => 'The Role has been Deleted.'], 200); // Return with a 200 OK status
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error occurred while deleting the role', 'error' => $e->getMessage()], 403);
+        }
     }
 }
