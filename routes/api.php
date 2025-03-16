@@ -41,16 +41,19 @@ Route::controller(AuthController::class)
     // Route::get('/whoamI','whoamI');
     Route::middleware('auth:sanctum')->group(function () {
       Route::post('/logout', 'logout');
-      Route::get('/whoamI','whoamI');
+      Route::get('/whoamI', 'whoamI');
     });
   });
 
 Route::controller(BrandController::class)
+  ->middleware('auth:sanctum')
   ->prefix('v1/brand')
   ->group(function () {
     Route::get('/', 'index');
     Route::post('/store', 'store');
-    Route::get('/show/{brand}', 'show');
-    Route::put('/update/{brand}', 'update');
-    Route::delete('/destroy/{brand}', 'destroy');
+    Route::get('/show/{id}', 'show');
+    Route::post('/update/{id}', 'update');
+    Route::delete('/destroy/{id}', 'destroy');
+    Route::post('/restore/{id}', 'restore');
+    Route::delete('/delete/{id}', 'forceDelete');
   });

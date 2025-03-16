@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('image')->nullable();
-            $table->string('permalink')->nullable();
             $table->text('description')->nullable();
-            $table->tinyInteger('is_featured')->default('0');
             $table->tinyInteger('status')->default('1');
+            $table->string('permalink')->nullable();
+            $table->tinyInteger('is_featured')->default('0');
             $table->integer('sort_order');
-            $table->timestamps();
+            $table->nullableTimestamps();
             $table->softDeletes();
         });
     }

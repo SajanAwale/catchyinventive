@@ -20,7 +20,7 @@ class BrandController extends Controller
     public function index()
     {
         try {
-            $brands = Brand::all();
+            $brands = Brand::get();
             return response()->json($brands, 200);
             // return BrandResource::collection($brands);
         } catch (Exception $e) {
@@ -33,18 +33,12 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-        ]);
-        dd($validator);
-        // if ($validator->fails()) {
-        //     return response()->json([
-        //         'message' => 'all fields are required',
-        //         'error' => $validator->messages()
-        //     ], 422);
-        // }
         try {
+            $validator = $request->validate([
+                'name' => 'required|string',
+                'slug' => 'required|unique:brands,slug',
+                'description' => 'required|string',
+            ]);
             // $user_id = Auth::user()->id;
             $brand = Brand::get();
             $brandOrder = $brand->count() + 1;
@@ -56,11 +50,10 @@ class BrandController extends Controller
                 'description' => $request->description,
                 'permalink' => $request->permalink,
                 'description' => $request->description,
-                'is_featured' => $request->is_featured,
-                'status' => $request->status,
+                'is_featured' => $request->is_featured ?? 1, // 1 is false where 0 is true
+                'status' => $request->status ?? 0,
                 'sort_order' => $brandOrder,
                 'created_at' => now(),
-                'updated_at' => now(),
             ]);
             if ($request->hasFile('image')) {
                 $request->validate([
@@ -68,7 +61,7 @@ class BrandController extends Controller
                 ]);
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
-                $filePath = 'brand/' . $fileName;
+                $filePath = 'brand/' . $brand->name . '-' . $fileName;
                 // Store the file in storage file path
                 Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
                 // Set image path in the database
@@ -120,7 +113,7 @@ class BrandController extends Controller
             if ($request->image != null) {
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
-                $filePath = 'brand/' . $fileName;
+                $filePath = 'brand/' . $brand->name . '-' . $fileName;
                 // Store the file in storage file path
                 Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
                 // Set image path in the database
@@ -137,14 +130,12 @@ class BrandController extends Controller
                     'description' => $request->description,
                     'permalink' => $request->permalink,
                     'description' => $request->description,
-                    'is_featured' => $request->is_featured,
-                    'status' => $request->status,
-                    'sort_order' => $request->sort_order,
+                    'is_featured' => $request->is_featured ?? 1,
+                    'status' => $request->status ?? 0,
+                    'sort_order' => $brand->sort_order,
                     'image' => $brandImage,
                     'updated_at' => now(),
                 ]);
-
-
                 return response()->json([
                     'message' => 'Brand updated successfully.',
                     'data'    => $brand,
@@ -165,10 +156,40 @@ class BrandController extends Controller
         try {
             $brand = Brand::find($id)->delete();
             return response()->json([
-                'message' => 'Brand deleted successfully.',
+                'message' => 'Brand deleted successfully.'
             ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to delete product.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Recovered the particular Brand Information.
+     */
+    public function restore($id)
+    {
+        try {
+            Brand::withTrashed()->find($id)->restore();
+            return response()->json([
+                'message' => 'Brand restored successfully.'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => '', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Completely removed the Brand Information.
+     */
+    public function forceDelete($id)
+    {
+        try {
+            Brand::withTrashed()->find($id)->forceDelete();
+            return response()->json([
+                'message' => 'Brand force Delete successfully.'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => '', 'message' => $e->getMessage()], 500);
         }
     }
 }

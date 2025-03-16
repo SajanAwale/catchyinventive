@@ -52,40 +52,11 @@ class AuthController extends Controller
             // return response()->json(['message' => 'User registered successfully!']);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error occurred while registering admin user',
+                // 'message' => 'Error occurred while registering admin user',
                 'error' => $e->getMessage()
             ], 403);
         }
     }
-
-//     public function login(Request $request)
-// {
-//     // Validate the request
-//     $request->validate([
-//         'email' => 'required|email|exists:users,email',
-//         'password' => 'required|string|min:8',
-//     ]);
-
-//     $user = User::where('email', strtolower($request->email))->first();
-
-//     // Check if user exists and password is correct
-//     if (!$user || !Hash::check($request->password, $user->password)) {
-//         return response()->json(['error' => 'Invalid credentials'], 401);
-//     }
-
-//     // Authenticate the user
-//     if (!Auth::attempt($request->only('email', 'password'))) {
-//         return response()->json(['error' => 'Authentication failed'], 401);
-//     }
-
-//     // Generate a new token
-//     $token = $user->createToken('auth_token')->plainTextToken;
-
-//     return response()->json([
-//         'user' => $user->load('roles'),
-//         'token' => $token
-//     ]);
-// }
 
 public function login(Request $request)
 {
