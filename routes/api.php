@@ -21,13 +21,13 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('roles', RoleController::class);
 
 // Route::post('/register', [AuthController::class, 'registerAdminUser']);
-Route::post('/login ', [AuthController::class, 'login']);
+// Route::post('/login ', [AuthController::class, 'login']);
 
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+// Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('/user', function (Request $request) {
-  dd($request);
-});
+// Route::get('/user', function (Request $request) {
+//   dd($request);
+// });
 
 /**
  * Function related to the Auth Controller

@@ -37,7 +37,7 @@ class BrandController extends Controller
             'name' => 'required|string',
             'description' => 'required|string',
         ]);
-
+        dd($validator);
         // if ($validator->fails()) {
         //     return response()->json([
         //         'message' => 'all fields are required',

@@ -20,21 +20,15 @@ class AuthController extends Controller
      * @
      */
     public function registerAdminUser(Request $request)
-    {
-        DB::beginTransaction();
-        $validated = Validator::make($request->all(), [
-            'name' => 'required|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:8'
-        ]);
-
-        if ($validated->fails()) {
-            return response()->json([
-                'message' => 'Error occurred while registering admin user',
-                'error' => $validated->errors()
-            ], 403);
-        }
+    {  
         try {
+            $validated = $request->validate([
+                'name' => 'required|string',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|confirmed|min:8'
+            ]);
+           
+            DB::beginTransaction();
             // dd($request->all());
             $user = User::create([
                 'name' => $request['name'],
@@ -42,9 +36,8 @@ class AuthController extends Controller
                 'password' => Hash::make($request['password']),
             ]);
 
-            $rolePivot = UserRolePivot::updateOrCreate([
+            $rolePivot = UserRolePivot::insert([
                 'user_id' => $user->id,
-            ],[
                 'role_id' => $request['role_id'] ?? 1
             ]);
 
