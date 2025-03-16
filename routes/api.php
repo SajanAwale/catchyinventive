@@ -9,17 +9,25 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
+// Handle CORS preflight requests
+// Route::options('{any}', function () {
+//   return response()->noContent()
+//       ->header('Access-Control-Allow-Origin', 'http://localhost:5173')
+//       ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+//       ->header('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-Requested-With')
+//       ->header('Access-Control-Allow-Credentials', 'true');
+// })->where('any', '.*');
 
 Route::apiResource('roles', RoleController::class);
 
-Route::post('/register', [AuthController::class, 'registerAdminUser']);
+// Route::post('/register', [AuthController::class, 'registerAdminUser']);
 Route::post('/login ', [AuthController::class, 'login']);
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::get('/user', function (Request $request) {
-  return $request->user();
-})->middleware('auth:sanctum');
+  dd($request);
+});
 
 /**
  * Function related to the Auth Controller
@@ -30,7 +38,11 @@ Route::controller(AuthController::class)
   ->group(function () {
     Route::post('/register', 'registerAdminUser');
     Route::post('/login', 'login');
-    Route::post('/logout', 'logout')->middleware(['auth:sanctum']);
+    // Route::get('/whoamI','whoamI');
+    Route::middleware('auth:sanctum')->group(function () {
+      Route::post('/logout', 'logout');
+      Route::get('/whoamI','whoamI');
+    });
   });
 
 Route::controller(BrandController::class)

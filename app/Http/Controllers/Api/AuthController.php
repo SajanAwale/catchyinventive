@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -20,12 +21,7 @@ class AuthController extends Controller
      */
     public function registerAdminUser(Request $request)
     {
-        // dd($request['role_id']);
-        // $validated = $request->validate([
-        //     'name' => 'required|max:255',
-        //     'email' => 'required|email|unique:users',
-        //     'password' => 'required|confirmed'
-        // ]);
+        DB::beginTransaction();
         $validated = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
@@ -39,24 +35,26 @@ class AuthController extends Controller
             ], 403);
         }
         try {
-
+            // dd($request->all());
             $user = User::create([
                 'name' => $request['name'],
                 'email' => $request['email'],
                 'password' => Hash::make($request['password']),
             ]);
 
-            $rolePivot = UserRolePivot::insert([
+            $rolePivot = UserRolePivot::updateOrCreate([
                 'user_id' => $user->id,
-                'role_id' => $request['role_id']
+            ],[
+                'role_id' => $request['role_id'] ?? 1
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            DB::commit();
             return response()->json([
                 'user' => $user,
-                'access_token' => $token
-            ], 200);
+                'access_token' => $token,
+            ], 200);  
 
             // return response()->json(['message' => 'User registered successfully!']);
         } catch (\Exception $e) {
@@ -67,50 +65,113 @@ class AuthController extends Controller
         }
     }
 
-    public function login(Request $request)
-    {
-        $validated = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users',
-            'password' => 'required:string|min:8',
-        ]);
+//     public function login(Request $request)
+// {
+//     // Validate the request
+//     $request->validate([
+//         'email' => 'required|email|exists:users,email',
+//         'password' => 'required|string|min:8',
+//     ]);
 
-        if ($validated->fails()) {
-            return response()->json([
-                'message' => 'Error occurred while logging in',
-                'error' => $validated->errors()
-            ], 403);
-        }
+//     $user = User::where('email', strtolower($request->email))->first();
 
-        $credentials = [
-            'email' => strtolower($request->email),
-            'password' => $request->password
-        ];
+//     // Check if user exists and password is correct
+//     if (!$user || !Hash::check($request->password, $user->password)) {
+//         return response()->json(['error' => 'Invalid credentials'], 401);
+//     }
 
-        try {
-            if (!Auth::attempt($credentials)) {
-                return response()->json([
-                    'error' => 'Invalid credentials'
-                ], 401);
-            }
+//     // Authenticate the user
+//     if (!Auth::attempt($request->only('email', 'password'))) {
+//         return response()->json(['error' => 'Authentication failed'], 401);
+//     }
 
-            $user = User::with('roles')->where('email', $request->email)->first();
-            // dd($user);
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                return [
-                    'message' => 'The provided password is incorrect.'
-                ];
-            }
+//     // Generate a new token
+//     $token = $user->createToken('auth_token')->plainTextToken;
 
-            $token = $user->createToken($user->name);
-            // dd($token);
-            return [
-                'user' => $user,
-                'token' => $token
-            ];
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 403);
-        }
+//     return response()->json([
+//         'user' => $user->load('roles'),
+//         'token' => $token
+//     ]);
+// }
+
+public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|exists:users,email',
+        'password' => 'required|string|min:8',
+    ]);
+
+    $user = User::with('roles')->where('email', strtolower($request->email))->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['error' => 'Invalid credentials'], 401);   
     }
+
+    // Create a token
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    // Format role information
+    $roles = $user->roles->map(function ($role) {
+        return [
+            'id' => $role->id,
+            'name' => $role->name
+        ];
+    });
+
+    return response()->json([
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+        ],
+        'roles' => $roles,
+        'auth_token' => $token,
+    ]); // Secure, HttpOnly, SameSite=Lax
+}
+
+
+public function whoAmI(Request $request)
+{
+    // Retrieve token from cookie (just for debugging purpose)
+    $token = $request->cookie('auth_token');
+    // dd($token); // Uncomment if you need to check the token value
+
+    if (!$token) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    try {
+        // Automatically authenticate using Sanctum
+        $user = $request->user(); // Or auth()->user() - this will get the authenticated user
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Format role information
+        $roles = $user->roles->map(function($role) {
+            return [
+                'id' => $role->id,
+                'name' => $role->name
+            ];
+        });
+
+        // Return response with user and roles
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at,
+            ],
+            'roles' => $roles
+        ]);
+    } catch (\Exception $e) {
+        // Handle exception (e.g., if the token is invalid or expired)
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+}
 
     public function logout(Request $request)
     {
