@@ -1,10 +1,14 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\RoleController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ProductCategoriesController;
+use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\Api\VariationController;
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -57,3 +61,48 @@ Route::controller(BrandController::class)
     Route::post('/restore/{id}', 'restore');
     Route::delete('/delete/{id}', 'forceDelete');
   });
+
+
+// Route::apiResource('categories', ProductCategoriesController::class)->middleware('auth:sanctum');
+
+Route::controller(ProductCategoriesController::class)
+  ->middleware('auth:sanctum')
+  ->prefix('v1/categories')
+  ->group(function () {
+    Route::get('/', 'index');
+    Route::post('/store', 'store');
+    Route::get('/show/{id}', 'show');
+    Route::post('/update/{id}', 'update');
+    Route::delete('/destroy/{id}', 'destroy');
+    Route::post('/restore/{id}', 'restore');
+    Route::delete('/delete/{id}', 'forceDelete');
+  });
+
+Route::controller(ProductsController::class)
+  ->middleware('auth:sanctum')
+  ->prefix('v1/products')
+  ->group(function () {
+    Route::get('/', 'index');
+    Route::post('/store', 'store');
+    Route::get('/show/{id}', 'show');
+    Route::post('/update/{id}', 'update');
+    Route::delete('/destroy/{id}', 'destroy');
+    Route::post('/restore/{id}', 'restore');
+    Route::delete('/delete/{id}', 'forceDelete');
+  });
+  
+// Route::apiResource('variation', VariationController::class)->middleware('auth:sanctum');
+Route::controller(VariationController::class)
+  ->middleware('auth:sanctum')
+  ->prefix('v1/variation')
+  ->group(function () {
+    Route::get('/', 'index');
+    Route::post('/store', 'store');
+    Route::get('/show/{id}', 'show');
+    Route::post('/update/{id}', 'update');
+    Route::delete('/destroy/{id}', 'destroy');
+    Route::post('/restore/{id}', 'restore');
+    Route::delete('/delete/{id}', 'forceDelete');
+  });
+
+

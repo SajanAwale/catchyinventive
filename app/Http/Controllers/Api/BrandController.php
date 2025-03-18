@@ -20,7 +20,7 @@ class BrandController extends Controller
     public function index()
     {
         try {
-            $brands = Brand::get();
+            $brands = Brand::withTrashed()->get();
             return response()->json($brands, 200);
             // return BrandResource::collection($brands);
         } catch (Exception $e) {
@@ -61,7 +61,7 @@ class BrandController extends Controller
                 ]);
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
-                $filePath = 'brand/' . $brand->name . '-' . $fileName;
+                $filePath = 'brand/' . '-' . $fileName;
                 // Store the file in storage file path
                 Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
                 // Set image path in the database
@@ -113,7 +113,7 @@ class BrandController extends Controller
             if ($request->image != null) {
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
-                $filePath = 'brand/' . $brand->name . '-' . $fileName;
+                $filePath = 'brand/' . $fileName;
                 // Store the file in storage file path
                 Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
                 // Set image path in the database
