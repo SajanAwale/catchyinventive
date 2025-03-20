@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Products;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class ProductsController extends Controller
 {
@@ -32,6 +32,7 @@ class ProductsController extends Controller
                 'category_id' => 'required',
                 'name' => 'required',
             ]);
+            // dd($request->all());
             $products = Products::create([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
@@ -50,6 +51,8 @@ class ProductsController extends Controller
     public function show($product_id)
     {
         try {
+            $product = Products::with('category')->findOrFail($product_id);
+            return response()->json($product);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
@@ -58,7 +61,7 @@ class ProductsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateproductsRequest $request, products $products)
+    public function update(Request $request, products $products)
     {
         try {
         } catch (\Exception $e) {
