@@ -9,10 +9,16 @@ class ProductCategories extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductCategoriesFactory> */
     use HasFactory;
-    
+
     protected $table = 'product_categories';
 
     protected $fillable = ['parent_category_id', 'brand_id', 'category_name'];
+
+    protected $casts = [
+        'parent_category_id' => 'integer',
+        'brand_id' => 'integer',
+        'category_name' => 'string',
+    ];
 
     // Parent category (Self Join)
     public function parent()

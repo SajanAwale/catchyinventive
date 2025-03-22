@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ProductCategoriesController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\VariationController;
-
+use App\Http\Controllers\UsersController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -49,6 +49,34 @@ Route::controller(AuthController::class)
     });
   });
 
+Route::controller(UsersController::class)
+  ->middleware('auth:sanctum')
+  ->prefix('v1/users')
+  ->group(function () {
+    Route::get('/', 'index');
+    // Route::post('/store', 'store');
+    Route::get('/show/{id}', 'show');
+    // Route::post('/update/{id}', 'update');
+    // Route::delete('/destroy/{id}', 'destroy');
+    // Route::post('/restore/{id}', 'restore');
+    Route::delete('/delete/{id}', 'forceDelete');
+    Route::post('userStatus/update/{id}', 'userStatusUpdate');
+  });
+
+// Route::controller(BrandController::class)
+//   // ->middleware('auth:sanctum')
+//   ->prefix('v1/brand')
+//   ->group(function () {
+//     Route::get('/', 'index')->name('brand.index');
+//     Route::post('/store', 'store')->name('brand.store');
+//     Route::get('/show/{id}', 'show')->name('brand.show');
+//     Route::post('/update/{id}', 'update')->name('brand.update');
+//     Route::delete('/destroy/{id}', 'destroy')->name('brand.destroy');
+//     Route::post('/restore/{id}', 'restore')->name('brand.restore');
+//     Route::delete('/delete/{id}', 'forceDelete')->name('brand.forceDelete');
+//     Route::post('/status/update/{id}', 'statusUpdate')
+//   });
+
 Route::controller(BrandController::class)
   ->middleware('auth:sanctum')
   ->prefix('v1/brand')
@@ -60,8 +88,8 @@ Route::controller(BrandController::class)
     Route::delete('/destroy/{id}', 'destroy');
     Route::post('/restore/{id}', 'restore');
     Route::delete('/delete/{id}', 'forceDelete');
+    Route::post('/status/update/{id}', 'statusUpdate');
   });
-
 
 // Route::apiResource('categories', ProductCategoriesController::class)->middleware('auth:sanctum');
 
@@ -90,7 +118,7 @@ Route::controller(ProductsController::class)
     Route::post('/restore/{id}', 'restore');
     Route::delete('/delete/{id}', 'forceDelete');
   });
-  
+
 // Route::apiResource('variation', VariationController::class)->middleware('auth:sanctum');
 Route::controller(VariationController::class)
   ->middleware('auth:sanctum')
@@ -104,5 +132,3 @@ Route::controller(VariationController::class)
     Route::post('/restore/{id}', 'restore');
     Route::delete('/delete/{id}', 'forceDelete');
   });
-
-

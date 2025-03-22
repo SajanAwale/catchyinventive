@@ -21,10 +21,14 @@ class BrandController extends Controller
     {
         try {
             $brands = Brand::withTrashed()->get();
-            return response()->json($brands, 200);
-            // return BrandResource::collection($brands);
+            return response()->json([
+                'message' => 'Success to fetch brands.',
+                'data' => $brands,
+                'status' => 200,
+
+            ], 200);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to fetch brands.', 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -61,7 +65,7 @@ class BrandController extends Controller
                 ]);
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
-                $filePath = 'brand/' . '-' . $fileName;
+                $filePath = 'brand/' . $fileName;
                 // Store the file in storage file path
                 Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
                 // Set image path in the database
@@ -72,7 +76,8 @@ class BrandController extends Controller
             return response()->json([
                 'message' => 'Brand created successfully.',
                 'data'    => $brand,
-            ], 201);
+                'status' => 200,
+            ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to create product.', 'message' => $e->getMessage()], 500);
         }
@@ -86,7 +91,11 @@ class BrandController extends Controller
         try {
             $brand = Brand::find($id);
             if ($brand) {
-                return response()->json($brand, 200);
+                return response()->json([
+                    'message' => 'Brand fetch successfully.',
+                    'data'    => $brand,
+                    'status' => 200,
+                ], 200);
             } else {
                 return response()->json(['error' => 'Brand not found.'], 404);
             }
@@ -139,6 +148,7 @@ class BrandController extends Controller
                 return response()->json([
                     'message' => 'Brand updated successfully.',
                     'data'    => $brand,
+                    'status' => 200,
                 ], 200);
             } else {
                 return response()->json(['error' => 'Brand not found.'], 404);
@@ -156,7 +166,9 @@ class BrandController extends Controller
         try {
             $brand = Brand::find($id)->delete();
             return response()->json([
-                'message' => 'Brand deleted successfully.'
+                'message' => 'Brand deleted successfully.',
+                'data'    => $brand,
+                'status' => 200,
             ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to delete product.', 'message' => $e->getMessage()], 500);
@@ -171,7 +183,8 @@ class BrandController extends Controller
         try {
             Brand::withTrashed()->find($id)->restore();
             return response()->json([
-                'message' => 'Brand restored successfully.'
+                'message' => 'Brand restored successfully.',
+                'status' => 200,
             ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => '', 'message' => $e->getMessage()], 500);
@@ -186,10 +199,30 @@ class BrandController extends Controller
         try {
             Brand::withTrashed()->find($id)->forceDelete();
             return response()->json([
-                'message' => 'Brand force Delete successfully.'
+                'message' => 'Brand force Delete successfully.',
+                'status' => 200,
             ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => '', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update the status of the Brand active for use or not
+     */
+    public function statusUpdate($id, Request $request)
+    {
+        try {
+            $brand = Brand::find($id)->update([
+                'status' => $request->status,
+            ]);
+            return response()->json([
+                'message' => 'Brand status updated successfully.',
+                'data' => $brand,
+                'status' => 200,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

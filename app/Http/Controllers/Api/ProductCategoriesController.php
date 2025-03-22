@@ -18,9 +18,13 @@ class ProductCategoriesController extends Controller
     {
         try {
             $categories = ProductCategories::with('parent')->get();
-            return response()->json($categories);
+            return response()->json([
+                'message' => 'Category fetch successfully.',
+                'data'    => $categories,
+                'status' => 200,
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -30,8 +34,9 @@ class ProductCategoriesController extends Controller
     public function store(Request $request)
     {
         try {
+            // dd(1);
             $request->validate([
-                'category_name' => 'required|string|max:255',
+                'category_name' => 'required|string|max:255|unique:product_categories,category_name',
                 'parent_category_id' => 'nullable|exists:product_categories,id',
                 'brand_id' => 'required|exists:brands,id',
             ]);
@@ -42,9 +47,14 @@ class ProductCategoriesController extends Controller
                 'brand_id' => $request->brand_id,
                 'created_at' => Carbon::now(),
             ]);
-            return response()->json(['message' => 'Category created successfully', 'category' => $category], 201);
+
+            return response()->json([
+                'message' => 'Category store successfully.',
+                'data'    => $category,
+                'status' => 200,
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -55,9 +65,14 @@ class ProductCategoriesController extends Controller
     {
         try {
             $category = ProductCategories::with('children')->findOrFail($id);
-            return response()->json($category);
+
+            return response()->json([
+                'message' => 'Category fetch successfully.',
+                'data'    => $category,
+                'status' => 200,
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -81,9 +96,13 @@ class ProductCategoriesController extends Controller
                 'created_at' => Carbon::now(),
             ]);
 
-            return response()->json(['message' => 'Category updated successfully', 'category' => $category]);
+            return response()->json([
+                'message' => 'Category updated successfully.',
+                'data'    => $category,
+                'status' => 200,
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 402);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -96,9 +115,13 @@ class ProductCategoriesController extends Controller
             $category = ProductCategories::findOrFail($id);
             $category->delete();
 
-            return response()->json(['message' => 'Category deleted successfully']);
+            return response()->json([
+                'message' => 'Category deleted successfully.',
+                'data'    => $category,
+                'status' => 200,
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 402);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

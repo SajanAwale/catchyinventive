@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('product_categories');
-        
-        Schema::dropIfExists('categories');
-        Schema::enableForeignKeyConstraints();
+        Schema::table('users', function (Blueprint $table) {
+            //
+            $table->boolean('is_active')->default(true);
+        });
     }
 
     /**
@@ -23,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Optionally, recreate the tables in the down() method if needed.
+        Schema::table('users', function (Blueprint $table) {
+            //
+            $table->dropColumn('is_active');
+        });
     }
 };

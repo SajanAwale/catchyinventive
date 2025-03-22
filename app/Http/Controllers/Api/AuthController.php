@@ -20,20 +20,21 @@ class AuthController extends Controller
      * @
      */
     public function registerAdminUser(Request $request)
-    {  
+    {
         try {
             $validated = $request->validate([
                 'name' => 'required|string',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|confirmed|min:8'
             ]);
-           
+
             DB::beginTransaction();
             // dd($request->all());
             $user = User::create([
                 'name' => $request['name'],
                 'email' => $request['email'],
                 'password' => Hash::make($request['password']),
+                'is_active' => true,
             ]);
 
             $rolePivot = UserRolePivot::insert([
@@ -47,7 +48,7 @@ class AuthController extends Controller
             return response()->json([
                 'user' => $user,
                 'access_token' => $token,
-            ], 200);  
+            ], 200);
 
             // return response()->json(['message' => 'User registered successfully!']);
         } catch (\Exception $e) {
@@ -58,70 +59,30 @@ class AuthController extends Controller
         }
     }
 
-public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email|exists:users,email',
-        'password' => 'required|string|min:8',
-    ]);
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:8',
+        ]);
 
-    $user = User::with('roles')->where('email', strtolower($request->email))->first();
+        $user = User::with('roles')->where('email', strtolower($request->email))->first();
 
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        return response()->json(['error' => 'Invalid credentials'], 401);   
-    }
-
-    // Create a token
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    // Format role information
-    $roles = $user->roles->map(function ($role) {
-        return [
-            'id' => $role->id,
-            'name' => $role->name
-        ];
-    });
-
-    return response()->json([
-        'user' => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'email_verified_at' => $user->email_verified_at,
-        ],
-        'roles' => $roles,
-        'auth_token' => $token,
-    ]); // Secure, HttpOnly, SameSite=Lax
-}
-
-
-public function whoAmI(Request $request)
-{
-    // Retrieve token from cookie (just for debugging purpose)
-    $token = $request->cookie('auth_token');
-    // dd($token); // Uncomment if you need to check the token value
-
-    if (!$token) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    try {
-        // Automatically authenticate using Sanctum
-        $user = $request->user(); // Or auth()->user() - this will get the authenticated user
-
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
+        // Create a token
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         // Format role information
-        $roles = $user->roles->map(function($role) {
+        $roles = $user->roles->map(function ($role) {
             return [
                 'id' => $role->id,
                 'name' => $role->name
             ];
         });
 
-        // Return response with user and roles
         return response()->json([
             'user' => [
                 'id' => $user->id,
@@ -129,13 +90,53 @@ public function whoAmI(Request $request)
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at,
             ],
-            'roles' => $roles
-        ]);
-    } catch (\Exception $e) {
-        // Handle exception (e.g., if the token is invalid or expired)
-        return response()->json(['error' => 'Unauthorized'], 401);
+            'roles' => $roles,
+            'auth_token' => $token,
+        ]); // Secure, HttpOnly, SameSite=Lax
     }
-}
+
+
+    public function whoAmI(Request $request)
+    {
+        // Retrieve token from cookie (just for debugging purpose)
+        $token = $request->cookie('auth_token');
+        // dd($token); // Uncomment if you need to check the token value
+
+        if (!$token) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        try {
+            // Automatically authenticate using Sanctum
+            $user = $request->user(); // Or auth()->user() - this will get the authenticated user
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            // Format role information
+            $roles = $user->roles->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name
+                ];
+            });
+
+            // Return response with user and roles
+            return response()->json([
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'email_verified_at' => $user->email_verified_at,
+                ],
+                'roles' => $roles
+            ]);
+        } catch (\Exception $e) {
+            // Handle exception (e.g., if the token is invalid or expired)
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
 
     public function logout(Request $request)
     {
