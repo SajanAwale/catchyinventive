@@ -7,8 +7,8 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ProductCategoriesController;
 use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VariationController;
-use App\Http\Controllers\UsersController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -49,7 +49,7 @@ Route::controller(AuthController::class)
     });
   });
 
-Route::controller(UsersController::class)
+Route::controller(UserController::class)
   ->middleware('auth:sanctum')
   ->prefix('v1/users')
   ->group(function () {

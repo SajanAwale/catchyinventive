@@ -16,7 +16,11 @@ class ProductsController extends Controller
     {
         try {
             $products = Products::orderBy('id', 'desc')->get();
-            return response()->json($products);
+            return response()->json([
+                'message' => 'Product fetch successfully.',
+                'data' => $products,
+                'status' => 200,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
@@ -32,14 +36,18 @@ class ProductsController extends Controller
                 'category_id' => 'required',
                 'name' => 'required',
             ]);
-            // dd($request->all());
+
             $products = Products::create([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'description' => $request->description,
                 'created_at' => Carbon::now(),
             ]);
-            return response()->json($products);
+            return response()->json([
+                'message' => 'Product created successfully.',
+                'data' => $products,
+                'status' => 200,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
@@ -51,8 +59,12 @@ class ProductsController extends Controller
     public function show($product_id)
     {
         try {
-            $product = Products::with('category')->findOrFail($product_id);
-            return response()->json($product);
+            $products = Products::with('category')->findOrFail($product_id);
+            return response()->json([
+                'message' => 'Product fetch successfully.',
+                'data' => $products,
+                'status' => 200,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
@@ -61,9 +73,25 @@ class ProductsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, products $products)
+    public function update(Request $request, $id)
     {
         try {
+            $validator = $request->validate([
+                'category_id' => 'required',
+                'name' => 'required',
+            ]);
+            $products = Products::findOrFail($id);
+
+            $products->category_id = $request->category_id;
+            $products->name = $request->name;
+            $products->description = $request->description;
+            $products->updated_at = Carbon::now();
+
+            return response()->json([
+                'message' => 'Product updated successfully.',
+                'data' => $products,
+                'status' => 200,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
@@ -72,9 +100,16 @@ class ProductsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(products $products)
+    public function destroy($id)
     {
         try {
+            $products = Products::findOrFail($id);
+            $products->delete();
+            return response()->json([
+                'message' => 'Product delete successfully',
+                'data' => $products,
+                'status' => 200,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }

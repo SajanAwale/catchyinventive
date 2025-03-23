@@ -22,7 +22,7 @@ class BrandController extends Controller
         try {
             $brands = Brand::withTrashed()->get();
             return response()->json([
-                'message' => 'Success to fetch brands.',
+                'message' => 'Brand fetch successfully.',
                 'data' => $brands,
                 'status' => 200,
 
@@ -74,7 +74,7 @@ class BrandController extends Controller
             $brand->save();
 
             return response()->json([
-                'message' => 'Brand created successfully.',
+                'message' => 'Brand created sucessfully.',
                 'data'    => $brand,
                 'status' => 200,
             ], 200);
