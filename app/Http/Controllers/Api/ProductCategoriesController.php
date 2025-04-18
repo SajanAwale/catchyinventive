@@ -17,7 +17,7 @@ class ProductCategoriesController extends Controller
     public function index()
     {
         try {
-            $categories = ProductCategories::with('parent')->get();
+            $categories = ProductCategories::with('children')->get();
             return response()->json([
                 'message' => 'Category fetch successfully.',
                 'data'    => $categories,

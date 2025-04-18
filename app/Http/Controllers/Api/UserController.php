@@ -16,7 +16,7 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::orderBy("id", "desc")->paginate(10);
+            $users = User::orderBy("id", "desc")->paginate(15);
             return response()->json([
                 'message' => 'Category store successfully.',
                 'data'    => $users,
