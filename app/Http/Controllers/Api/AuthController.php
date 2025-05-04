@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserRolePivot;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -61,42 +62,44 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // dd($request->all());
-        // dd($request->getContent());
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required|string|min:8',
-        ]);
+        try {
+            $request->validate([
+                'email' => 'required|email|exists:users,email',
+                'password' => 'required|string|min:8',
+            ]);
 
-        $user = User::with('roles')->where('email', strtolower($request->email))->first();
+            $user = User::with('roles')->where('email', strtolower($request->email))->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json(['error' => 'Invalid credentials'], 401);
+            }
+
+            // Create a token
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            // Format role information
+            $roles = $user->roles->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name
+                ];
+            });
+
+            return response()->json([
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'email_verified_at' => $user->email_verified_at,
+                ],
+                'roles' => $roles,
+                'auth_token' => $token,
+            ]); // Secure, HttpOnly, SameSite=Lax
+        } catch (\Exception $e) {
+            // Handle exception (e.g., if the token is invalid or expired)
+            return response()->json(['error' => 'Unauthorized'], 500);
         }
-
-        // Create a token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // Format role information
-        $roles = $user->roles->map(function ($role) {
-            return [
-                'id' => $role->id,
-                'name' => $role->name
-            ];
-        });
-
-        return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'email_verified_at' => $user->email_verified_at,
-            ],
-            'roles' => $roles,
-            'auth_token' => $token,
-        ]); // Secure, HttpOnly, SameSite=Lax
     }
-
 
     public function whoAmI(Request $request)
     {

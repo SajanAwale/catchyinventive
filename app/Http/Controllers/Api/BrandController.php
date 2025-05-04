@@ -59,10 +59,12 @@ class BrandController extends Controller
                 'sort_order' => $brandOrder,
                 'created_at' => now(),
             ]);
+
             if ($request->hasFile('image')) {
                 $request->validate([
-                    'image' => 'image|mimes:jpeg,png,jpg,gif,svg'
+                    'image' => 'image|mimes:jpeg,png,jpg'
                 ]);
+                // size validation thumbnail and resize
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
                 $filePath = 'brand/' . $fileName;

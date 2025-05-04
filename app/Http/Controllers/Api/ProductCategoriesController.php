@@ -17,7 +17,9 @@ class ProductCategoriesController extends Controller
     public function index()
     {
         try {
-            $categories = ProductCategories::with('children')->get();
+            $categories = ProductCategories::with('children')
+                ->whereNull('parent_category_id')
+                ->get();
             return response()->json([
                 'message' => 'Category fetch successfully.',
                 'data'    => $categories,
@@ -64,7 +66,8 @@ class ProductCategoriesController extends Controller
     public function show($id)
     {
         try {
-            $category = ProductCategories::with('children')->findOrFail($id);
+            $category = ProductCategories::with('children')
+                ->findOrFail($id);
 
             return response()->json([
                 'message' => 'Category fetch successfully.',
@@ -101,6 +104,21 @@ class ProductCategoriesController extends Controller
                 'data'    => $category,
                 'status' => 200,
             ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Remove the sub-category 
+     */
+    public function destroySubCategory($category_id, $sub_category_id)
+    {
+        try {
+            $productCategory = ProductCategories::where('parent_category_id', $category_id)
+                                                ->where('id', $sub_category_id)
+                                                ->get();
+            dd($productCategory);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }

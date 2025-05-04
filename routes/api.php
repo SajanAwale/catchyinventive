@@ -101,9 +101,11 @@ Route::controller(ProductCategoriesController::class)
     Route::post('/store', 'store');
     Route::get('/show/{id}', 'show');
     Route::post('/update/{id}', 'update');
-    Route::delete('/destroy/{id}', 'destroy');
-    Route::post('/restore/{id}', 'restore');
-    Route::delete('/delete/{id}', 'forceDelete');
+    Route::delete('/delete/category/{id}', 'destroyCategory');
+    Route::delete('/delete/subcategory/{category_id}/{sub_category_id}', 'destroySubCategory');
+    // Route::post('/restore/{id}', 'restore');
+    
+    // Route::delete('/delete/subcategory/{id}', 'forceDelete');
   });
 
 Route::controller(ProductsController::class)
