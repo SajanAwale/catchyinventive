@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ProductCategoriesController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VariationController;
+use App\Http\Controllers\Api\BannerController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -133,4 +134,18 @@ Route::controller(VariationController::class)
     Route::delete('/destroy/{id}', 'destroy');
     Route::post('/restore/{id}', 'restore');
     Route::delete('/delete/{id}', 'forceDelete');
+  });
+
+Route::get('/v1/banner', [BannerController::class, 'index']);
+Route::controller(BannerController::class)
+  ->prefix('v1/banner')
+  // ->middleware('auth:sanctum')
+  ->group(function () {
+    Route::post('/store', 'store');
+    Route::get('/show/{id}', 'show');
+    Route::post('/update/{id}', 'update');
+    Route::delete('/destroy/{id}', 'destroy');
+    Route::post('/restore/{id}', 'restore');
+    Route::delete('/delete/{id}', 'forceDelete');
+    Route::post('/status/update/{id}', 'statusUpdate');
   });
