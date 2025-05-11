@@ -6,6 +6,7 @@ use App\Models\Products;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductsController extends Controller
 {
@@ -15,7 +16,7 @@ class ProductsController extends Controller
     public function index()
     {
         try {
-            $products = Products::orderBy('id', 'desc')->get();
+            $products = Products::with('category.parent')->get();
             return response()->json([
                 'message' => 'Product fetch successfully.',
                 'data' => $products,
@@ -43,6 +44,23 @@ class ProductsController extends Controller
                 'description' => $request->description,
                 'created_at' => Carbon::now(),
             ]);
+
+            if ($request->hasFile('image')) {
+                // $this->uploadImage($request->product_image);
+                $request->validate([
+                    'image' => 'image|mimes:jpeg,png,jpg'
+                ]);
+
+                $image_path = $request->file('image');
+                $fileName = time() . '_' . $image_path->getClientOriginalName();
+                $filePath = 'product/' . $fileName;
+                // Store the file in storage file Path
+                Storage::disk('public')->putFileAs('product', $image_path, $fileName);
+                // Set image path in the database
+                $products->product_image  = $filePath;
+            }
+            $products->save();
+
             return response()->json([
                 'message' => 'Product created successfully.',
                 'data' => $products,
@@ -50,6 +68,17 @@ class ProductsController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Upload Image function
+     */
+    private function uploadImage(Request $request)
+    {
+        try {
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Image Upload Failed.', 'message' => $e->getMessage()], 500);
         }
     }
 

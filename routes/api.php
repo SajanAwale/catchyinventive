@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ProductCategoriesController;
+use App\Http\Controllers\Api\ProductListController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VariationController;
@@ -63,19 +64,13 @@ Route::controller(UserController::class)
     Route::post('userStatus/update/{id}', 'userStatusUpdate');
   });
 
-// Route::controller(BrandController::class)
-//   // ->middleware('auth:sanctum')
-//   ->prefix('v1/brand')
-//   ->group(function () {
-//     Route::get('/', 'index')->name('brand.index');
-//     Route::post('/store', 'store')->name('brand.store');
-//     Route::get('/show/{id}', 'show')->name('brand.show');
-//     Route::post('/update/{id}', 'update')->name('brand.update');
-//     Route::delete('/destroy/{id}', 'destroy')->name('brand.destroy');
-//     Route::post('/restore/{id}', 'restore')->name('brand.restore');
-//     Route::delete('/delete/{id}', 'forceDelete')->name('brand.forceDelete');
-//     Route::post('/status/update/{id}', 'statusUpdate')
-//   });
+Route::controller(ProductListController::class)
+  ->prefix('v1/allCategories')
+  ->group(function () {
+    Route::get('listCategories/all', 'showAllProducts');
+  });
+
+
 
 Route::controller(BrandController::class)
   ->middleware('auth:sanctum')
@@ -100,11 +95,12 @@ Route::controller(ProductCategoriesController::class)
     Route::get('/', 'index');
     Route::post('/store', 'store');
     Route::get('/show/{id}', 'show');
-    Route::post('/update/{id}', 'update');
+    Route::post('/update/subcategory', 'updateSubCategory');
+    Route::post('/update/category', 'updateCategory');
     Route::delete('/delete/category/{id}', 'destroyCategory');
     Route::delete('/delete/subcategory/{category_id}/{sub_category_id}', 'destroySubCategory');
-    // Route::post('/restore/{id}', 'restore');
-    
+    Route::post('/restore/{id}', 'restore');
+
     // Route::delete('/delete/subcategory/{id}', 'forceDelete');
   });
 

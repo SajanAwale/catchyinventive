@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductCategories extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductCategoriesFactory> */
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'product_categories';
 
@@ -28,6 +30,16 @@ class ProductCategories extends Model
 
     // Child categories
     public function children()
+    {
+        return $this->hasMany(ProductCategories::class, 'parent_category_id')->withTrashed();
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
+    public function childList()
     {
         return $this->hasMany(ProductCategories::class, 'parent_category_id');
     }

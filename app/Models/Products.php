@@ -22,10 +22,10 @@ class Products extends Model
         'deleted_at',
     ];
     protected $casts = [
-        'category_id'=> 'integer',
-        'name'=> 'string',
-        'description'=> 'string',
-        'product_image'=> 'string',
+        'category_id' => 'integer',
+        'name' => 'string',
+        'description' => 'string',
+        'product_image' => 'string',
 
     ];
 
