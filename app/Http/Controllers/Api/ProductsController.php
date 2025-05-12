@@ -109,18 +109,43 @@ class ProductsController extends Controller
                 'category_id' => 'required',
                 'name' => 'required',
             ]);
+
             $products = Products::findOrFail($id);
 
-            $products->category_id = $request->category_id;
-            $products->name = $request->name;
-            $products->description = $request->description;
-            $products->updated_at = Carbon::now();
+            if ($request->image != null) {
+                $request->validate([
+                    'image' => 'image|mimes:jpeg,png,jpg'
+                ]);
 
-            return response()->json([
-                'message' => 'Product updated successfully.',
-                'data' => $products,
-                'status' => 200,
-            ]);
+                $image_path = $request->file('image');
+                $fileName = time() . '_' . $image_path->getClientOriginalName();
+                $filePath = 'product/' . $fileName;
+                // Store the file in storage file Path
+                Storage::disk('public')->putFileAs('product', $image_path, $fileName);
+                // Set image path in the database
+                $productsInfo  = $filePath;
+            } else {
+                $productsInfo = $products->product_image;
+            }
+
+            // Update the information from the request
+            if ($products) {
+                $products = Products::where('id', $id)
+                    ->update([
+                        'category_id' => $request->category_id,
+                        'name' => $request->name,
+                        'description' => $request->description,
+                        'product_image' => $productsInfo,
+                        'updated_at' => Carbon::now()
+                    ]);
+                return response()->json([
+                    'message' => 'Product updated successfully.',
+                    'data' => $products,
+                    'status' => 200,
+                ]);
+            } else {
+                return response()->json(['error' => 'Product not found.'], 404);
+            }
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
@@ -133,7 +158,7 @@ class ProductsController extends Controller
     {
         try {
             $products = Products::findOrFail($id);
-            $products->delete();
+            $products->forceDelete();
             return response()->json([
                 'message' => 'Product delete successfully',
                 'data' => $products,

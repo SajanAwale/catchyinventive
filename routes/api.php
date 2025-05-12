@@ -96,8 +96,8 @@ Route::controller(ProductCategoriesController::class)
     Route::get('/', 'index');
     Route::post('/store', 'store');
     Route::get('/show/{id}', 'show');
-    Route::post('/update/subcategory', 'updateSubCategory');
-    Route::post('/update/category', 'updateCategory');
+    Route::post('/update/subcategory/{id}', 'updateSubCategory');
+    Route::post('/update/category/{id}', 'updateCategory');
     Route::delete('/delete/category/{id}', 'destroyCategory');
     Route::delete('/delete/subcategory/{category_id}/{sub_category_id}', 'destroySubCategory');
     Route::post('/restore/{id}', 'restore');
@@ -114,8 +114,8 @@ Route::controller(ProductsController::class)
     Route::get('/show/{id}', 'show');
     Route::post('/update/{id}', 'update');
     Route::delete('/destroy/{id}', 'destroy');
-    Route::post('/restore/{id}', 'restore');
-    Route::delete('/delete/{id}', 'forceDelete');
+    // Route::post('/restore/{id}', 'restore');
+    // Route::delete('/delete/{id}', 'forceDelete');
   });
 
 // Route::apiResource('variation', VariationController::class)->middleware('auth:sanctum');

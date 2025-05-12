@@ -22,7 +22,8 @@ class Banner extends Model
 
     // Type casting for attributes
     protected $casts = [
-        'price' => 'decimal:2',
+        // 'price' => 'decimal:2',
+        'price' => 'double',
         'status' => 'boolean',
     ];
 }

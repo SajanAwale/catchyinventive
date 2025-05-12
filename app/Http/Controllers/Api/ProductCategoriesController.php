@@ -18,8 +18,8 @@ class ProductCategoriesController extends Controller
     {
         try {
             $categories = ProductCategories::with(
-                'children:id,parent_category_id,category_name,brand_id',
-                'brand:id,name,slug,image,status,description,created_at'
+                'children:id,parent_category_id,brand_id,category_name,created_at,deleted_at',
+                'brand:id,name,slug,image,status,description,created_at,deleted_at'
             )
                 ->withTrashed()
                 ->whereNull('parent_category_id')
@@ -85,7 +85,7 @@ class ProductCategoriesController extends Controller
     /**
      * Update the bulk subCategories.
      */
-    public function updateSubCategory(Request $request)
+    public function updateSubCategory(Request $request, $id)
     {
         try {
             $request->validate([
@@ -93,8 +93,15 @@ class ProductCategoriesController extends Controller
                 'parent_category_id' => 'nullable|exists:product_categories,id',
             ]);
 
-            $category = ProductCategories::where('id', $request->id)->whereNotNull('parent_category_id')->first();
+            $category = ProductCategories::where('id', $id)->whereNotNull('parent_category_id')->first();
 
+            if ($category == null) {
+                return response()->json([
+                    'message' => 'Item is not a SubCategory',
+                    'data' => null,
+                    'status' => 401,
+                ], 401);
+            }
             $category->update([
                 'category_name' => $request->category_name,
                 'updated_at' => Carbon::now(),
@@ -111,9 +118,9 @@ class ProductCategoriesController extends Controller
     }
 
     /**
-     * Update the bulk subCategories.
+     * Update the bulk Categories.
      */
-    public function updateCategory(Request $request)
+    public function updateCategory(Request $request, $id)
     {
         try {
             $request->validate([
@@ -121,7 +128,7 @@ class ProductCategoriesController extends Controller
                 'parent_category_id' => 'nullable|exists:product_categories,id',
             ]);
 
-            $category = ProductCategories::where('id', $request->id)->whereNull('parent_category_id')->first();
+            $category = ProductCategories::where('id', $id)->whereNull('parent_category_id')->first();
             if ($category == null) {
                 return response()->json([
                     'message' => 'Category not found',
@@ -153,7 +160,7 @@ class ProductCategoriesController extends Controller
         try {
             $productCategory = ProductCategories::where('parent_category_id', $category_id)
                 ->where('id', $sub_category_id)
-                ->delete();
+                ->forceDelete();
 
             return response()->json([
                 'message' => 'SubCategory has been deleted.',
@@ -193,7 +200,7 @@ class ProductCategoriesController extends Controller
             if (count($subCategory) == 0) {
                 $productCategory = ProductCategories::where('id', $id)
                     ->whereNull('parent_category_id')
-                    ->delete();
+                    ->forceDelete();
             }
             return response()->json([
                 'message' => 'Category has been deleted.',

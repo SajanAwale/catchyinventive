@@ -15,8 +15,8 @@ class ProductListController extends Controller
     {
         try {
             $categories = ProductCategories::with(
-                'childList:id,parent_category_id,category_name,brand_id',
-                'brand:id,name,slug,image,status,description,created_at'
+                'childList',
+                // 'brand:id,name,slug,image,status,description,created_at'
             )
                 ->withTrashed()
                 ->whereNull('parent_category_id')

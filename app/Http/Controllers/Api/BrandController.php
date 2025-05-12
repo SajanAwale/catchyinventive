@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class BrandController extends Controller
 {
@@ -122,6 +123,10 @@ class BrandController extends Controller
             // Checking if the request has image file path with update in path 
             // new image is uploaded and path is updated
             if ($request->image != null) {
+                $request->validate([
+                    'image' => 'image|mimes:jpeg,png,jpg'
+                ]);
+
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
                 $filePath = 'brand/' . $fileName;
