@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - development
 name: 🚀 Deploy main api on push
 
 jobs:
