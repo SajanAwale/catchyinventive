@@ -17,13 +17,13 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('SKU');
+            $table->string('sku');
             $table->string('product_image')->nullable();
-            $table->unsignedBigInteger('quantity_on_stock')->default(0);
-            $table->bigInteger('cost_price')->default();
+            $table->unsignedBigInteger('qty_on_stock')->default(0);
+            $table->bigInteger('cost_price')->default(0);
             $table->bigInteger('selling_price')->default(0);
             $table->bigInteger('discount_percent')->default(0);
-            
+
             $table->nullableTimestamps();
         });
     }
