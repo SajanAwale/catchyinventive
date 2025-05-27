@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Storeproduct_categoriesRequest;
 use App\Http\Requests\Updateproduct_categoriesRequest;
 use App\Models\ProductCategories;
+use App\Models\Brand;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -40,10 +41,11 @@ class ProductCategoriesController extends Controller
     public function store(Request $request)
     {
         try {
+            // return response()->json($request->all());
             $request->validate([
-                'category_name' => 'required|string|max:255|unique:product_categories,category_name',
-                'parent_category_id' => 'nullable|exists:product_categories,id',
-                'brand_id' => 'required|exists:brands,id',
+                'category_name' => 'required|string|max:255',
+                'parent_category_id' => 'nullable',
+                'brand_id' => 'required',
             ]);
 
             $category = ProductCategories::create([
