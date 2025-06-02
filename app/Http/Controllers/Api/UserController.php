@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Laravel\Telescope\IncomingEntry;
+use Laravel\Telescope\Telescope;
 
 
 class UserController extends Controller
@@ -16,9 +19,11 @@ class UserController extends Controller
     public function index()
     {
         try {
+            Log::info('UserController@index was hit');
+
             $users = User::orderBy("id", "desc")->paginate(15);
             return response()->json([
-                'message' => 'Category store successfully.',
+                'message' => 'Users listed successfully.',
                 'data'    => $users,
                 'status' => 200,
             ], 200);

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductItems extends Model
 {
     use HasFactory;
+
+    protected $table = 'product_item';
 
     protected $fillable = [
         'product_id',
@@ -15,12 +18,19 @@ class ProductItems extends Model
         'qty_on_stock',
         'cost_price',
         'selling_price',
-        'discount_percentage'
+        'discount_percent',
+        'count',
     ];
 
     protected $casts = [
         'product_id' => 'integer',
         'product_image' => 'string',
         'image_series' => 'integer',
+        'count' => 'integer',
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Products::class, 'product_id', 'id');
+    }
 }
