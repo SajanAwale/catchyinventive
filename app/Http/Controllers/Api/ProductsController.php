@@ -59,6 +59,11 @@ class ProductsController extends Controller
             ]);
             // Handle image upload
             if ($request->hasFile('image')) {
+
+                $request->validate([
+                    'image' => 'image|mimes:jpeg,png,jpg'
+                ]);
+
                 $imagePath = $request->file('image');
                 $fileName = time() . '_' . $imagePath->getClientOriginalName();
                 $folderPath = 'product';

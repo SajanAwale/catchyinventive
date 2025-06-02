@@ -1,0 +1,10 @@
+{
+  "editor.defaultFormatter": "shufo.vscode-blade-formatter",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "notebook.defaultFormatter": null,
+  "editor.formatOnType": true,
+  "[php]": {
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+  }
+}
