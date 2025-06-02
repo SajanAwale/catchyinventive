@@ -19,23 +19,18 @@ class ProductItems extends Model
         'selling_price',
         'discount_percent',
         'count',
-        'created_at',
-        'updated_at'
     ];
 
     protected $casts = [
        // 'product_id' => 'integer',
         'sku' => 'string',
         'product_image' => 'string',
-        'qty_on_stock' => 'integer',
-        'cost_price' => 'float',
-        'selling_price' => 'float',
-        'discount_percent' => 'float',
+        'image_series' => 'integer',
         'count' => 'integer',
     ];
 
     public function product()
     {
-        return $this->belongsTo(Products::class, 'product_id');
+        return $this->belongsTo(Products::class, 'product_id', 'id');
     }
 }

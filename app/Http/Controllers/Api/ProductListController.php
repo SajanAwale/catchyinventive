@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ProductCategories;
+use App\Models\Products;
 
 class ProductListController extends Controller
 {
     /**
      * Display a listing of categories.
      */
-    public function showAllProducts()
+    public function showAllCategories()
     {
         try {
             $categories = ProductCategories::with(
@@ -24,6 +25,21 @@ class ProductListController extends Controller
             return response()->json([
                 'message' => 'Category fetch successfully.',
                 'data'    => $categories,
+                'status' => 200,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function showAllProducts()
+    {
+        try {
+            $products = Products::with('category', 'productItem')
+                ->get();
+            return response()->json([
+                'message' => 'All products fetch successfully.',
+                'data' => $products,
                 'status' => 200,
             ], 200);
         } catch (\Exception $e) {

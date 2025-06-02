@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorebrandRequest;
 use App\Http\Requests\UpdatebrandRequest;
-use App\Models\brand;
+use App\Models\Brand;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
