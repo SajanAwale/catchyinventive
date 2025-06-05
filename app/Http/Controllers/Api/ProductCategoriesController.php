@@ -42,9 +42,16 @@ class ProductCategoriesController extends Controller
     {
         try {
             // return response()->json($request->all());
+            // $request->validate([
+            //     'category_name' => 'required|string|max:255|unique',
+            //     'parent_category_id' => 'nullable',
+            //     'brand_id' => 'required',
+            // ]);
             $request->validate([
-                'category_name' => 'required|string|max:255',
-                'parent_category_id' => 'nullable',
+                'category_name' => 'required|string|max:255|unique:product_categories,category_name',
+                'parent_category_id' => 'nullable|exists:product_categories,id',
+            ], [
+                'category_name.unique' => 'This category name already exists.',
                 'brand_id' => 'required',
             ]);
 
@@ -91,10 +98,12 @@ class ProductCategoriesController extends Controller
     {
         try {
             $request->validate([
-                'category_name' => 'required|string|max:255',
+                'category_name' => 'required|string|max:255|unique:product_categories,category_name',
                 'parent_category_id' => 'nullable|exists:product_categories,id',
+            ], [
+                'category_name.unique' => 'This category name already exists.',
             ]);
-
+            
             $category = ProductCategories::where('id', $id)->whereNotNull('parent_category_id')->first();
 
             if ($category == null) {
