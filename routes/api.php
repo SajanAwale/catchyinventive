@@ -11,6 +11,18 @@ use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VariationController;
 use App\Http\Controllers\Api\BannerController;
+use Illuminate\Support\Facades\Log;
+
+Route::get('/debug', function () {
+  Log::info('Frontend hit /debug');
+  return response()->json(['message' => 'debug ok']);
+});
+
+
+Route::get('/ping', function () {
+  Log::info('Pinged API');
+  return response()->json(['message' => 'pong']);
+});
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -68,7 +80,8 @@ Route::controller(UserController::class)
 Route::controller(ProductListController::class)
   ->prefix('v1/allCategories')
   ->group(function () {
-    Route::get('listCategories/all', 'showAllProducts');
+    Route::get('listCategories/all', 'showAllCategories');
+    Route::get('showAllProducts/all', 'showAllProducts');
   });
 
 

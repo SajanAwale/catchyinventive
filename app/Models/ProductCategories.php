@@ -22,8 +22,17 @@ class ProductCategories extends Model
         'category_name' => 'string',
     ];
 
+    // protected $append = ['product_price'];
+
+    // public function getProductPriceAttribute(){
+
+    //     // Assuming you want the first product item's selling price
+    //     $product = $this->products()->with('prodcutItem')->first();
+    //     return $product?->productItem[0]->selling_price ?? null;
+    // }
+
     // Parent category (Self Join)
-    public function parent()
+    public function parentCategory()
     {
         return $this->belongsTo(ProductCategories::class, 'parent_category_id');
     }
@@ -43,4 +52,9 @@ class ProductCategories extends Model
     {
         return $this->hasMany(ProductCategories::class, 'parent_category_id');
     }
+
+    // public function products()
+    // {
+    //     return $this->hasMany(Products::class, 'category_id', 'id');
+    // }
 }
