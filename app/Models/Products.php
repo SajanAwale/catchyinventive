@@ -29,7 +29,7 @@ class Products extends Model
 
     ];
 
-    public function category()
+    public function subCategory()
     {
         return $this->belongsTo(ProductCategories::class, 'category_id');
     }
@@ -37,4 +37,6 @@ class Products extends Model
     public function productItem(){
         return $this->hasMany(ProductItems::class, 'product_id', 'id');
     }
+
+    
 }
