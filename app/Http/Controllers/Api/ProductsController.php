@@ -18,7 +18,7 @@ class ProductsController extends Controller
     public function index()
     {
         try {
-            $products = Products::with('category.parent')->get();
+            $products = Products::with('subCategory.parentCategory','productItem')->get();
             return response()->json([
                 'message' => 'Product fetch successfully.',
                 'data' => $products,
@@ -44,7 +44,6 @@ class ProductsController extends Controller
             'cost_price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'discount_percentage' => 'nullable|numeric|min:0|max:100',
-            'count' => 'required|integer|min:0',
         ]);
 
         DB::beginTransaction();
@@ -91,8 +90,8 @@ class ProductsController extends Controller
                 'cost_price' => $validated['cost_price'],
                 'selling_price' => $validated['selling_price'],
                 'discount_percent' => $validated['discount_percentage'] ?? 0,
-                'count' => (int) $validated['count'],
-                'created_at' => now(),
+                'count' => (int)1,
+                'created_at' => Carbon::now(),
             ]);
 
             DB::commit();
@@ -133,7 +132,10 @@ class ProductsController extends Controller
     public function show($product_id)
     {
         try {
-            $products = Products::with('category')->findOrFail($product_id);
+            $products = Products::with('subCategory.parentCategory', 'productItem')
+                                ->where('id', $product_id)
+                                ->findOrFail($product_id);
+
             return response()->json([
                 'message' => 'Product fetch successfully.',
                 'data' => $products,
@@ -165,8 +167,10 @@ class ProductsController extends Controller
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
                 $filePath = 'product/' . $fileName;
+
                 // Store the file in storage file Path
                 Storage::disk('public')->putFileAs('product', $image_path, $fileName);
+
                 // Set image path in the database
                 $productsInfo  = $filePath;
             } else {
@@ -183,6 +187,14 @@ class ProductsController extends Controller
                         'product_image' => $productsInfo,
                         'updated_at' => Carbon::now()
                     ]);
+                $productItem = ProductItems::where('product_id', $id)->update([
+                        'qty_on_stock' => $request->qty_in_stock,
+                        'cost_price' => $request->cost_price,
+                        'selling_price' => $request->selling_price,
+                        'discount_percent' => $request->discount_percentage ?? 0,
+                        'count' =>(int)$request->count + 1,
+                        'updated_at' => Carbon::now(),
+                ]);
                 return response()->json([
                     'message' => 'Product updated successfully.',
                     'data' => $products,
@@ -203,6 +215,7 @@ class ProductsController extends Controller
     {
         try {
             $products = Products::findOrFail($id);
+            $productItem = ProductItems::where('product_id', $id)->forceDelete();
             $products->forceDelete();
             return response()->json([
                 'message' => 'Product delete successfully',
