@@ -43,4 +43,5 @@ pnpm-debug.log*
 Homestead.json
 Homestead.yaml
 .env.example.backup
+/vendor
 
