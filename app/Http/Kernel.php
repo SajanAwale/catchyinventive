@@ -37,9 +37,11 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            \Laravel\Telescope\Http\Middleware\Authorize::class,
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,  // This is crucial for Sanctum
             'throttle:api', // This middleware rate limits API requests
             \Illuminate\Routing\Middleware\SubstituteBindings::class, // This middleware resolves route model bindings
+           
         ],
     ];
 

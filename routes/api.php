@@ -6,9 +6,23 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ProductCategoriesController;
+use App\Http\Controllers\Api\ProductListController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VariationController;
+use App\Http\Controllers\Api\BannerController;
+use Illuminate\Support\Facades\Log;
+
+Route::get('/debug', function () {
+  Log::info('Frontend hit /debug');
+  return response()->json(['message' => 'debug ok']);
+});
+
+
+Route::get('/ping', function () {
+  Log::info('Pinged API');
+  return response()->json(['message' => 'pong']);
+});
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -63,19 +77,14 @@ Route::controller(UserController::class)
     Route::post('userStatus/update/{id}', 'userStatusUpdate');
   });
 
-// Route::controller(BrandController::class)
-//   // ->middleware('auth:sanctum')
-//   ->prefix('v1/brand')
-//   ->group(function () {
-//     Route::get('/', 'index')->name('brand.index');
-//     Route::post('/store', 'store')->name('brand.store');
-//     Route::get('/show/{id}', 'show')->name('brand.show');
-//     Route::post('/update/{id}', 'update')->name('brand.update');
-//     Route::delete('/destroy/{id}', 'destroy')->name('brand.destroy');
-//     Route::post('/restore/{id}', 'restore')->name('brand.restore');
-//     Route::delete('/delete/{id}', 'forceDelete')->name('brand.forceDelete');
-//     Route::post('/status/update/{id}', 'statusUpdate')
-//   });
+Route::controller(ProductListController::class)
+  ->prefix('v1/allCategories')
+  ->group(function () {
+    Route::get('listCategories/all', 'showAllCategories');
+    Route::get('showAllProducts/all', 'showAllProducts');
+  });
+
+
 
 Route::controller(BrandController::class)
   ->middleware('auth:sanctum')
@@ -100,10 +109,13 @@ Route::controller(ProductCategoriesController::class)
     Route::get('/', 'index');
     Route::post('/store', 'store');
     Route::get('/show/{id}', 'show');
-    Route::post('/update/{id}', 'update');
-    Route::delete('/destroy/{id}', 'destroy');
+    Route::post('/update/subcategory/{id}', 'updateSubCategory');
+    Route::post('/update/category/{id}', 'updateCategory');
+    Route::delete('/delete/category/{id}', 'destroyCategory');
+    Route::delete('/delete/subcategory/{category_id}/{sub_category_id}', 'destroySubCategory');
     Route::post('/restore/{id}', 'restore');
-    Route::delete('/delete/{id}', 'forceDelete');
+
+    // Route::delete('/delete/subcategory/{id}', 'forceDelete');
   });
 
 Route::controller(ProductsController::class)
@@ -115,8 +127,8 @@ Route::controller(ProductsController::class)
     Route::get('/show/{id}', 'show');
     Route::post('/update/{id}', 'update');
     Route::delete('/destroy/{id}', 'destroy');
-    Route::post('/restore/{id}', 'restore');
-    Route::delete('/delete/{id}', 'forceDelete');
+    // Route::post('/restore/{id}', 'restore');
+    // Route::delete('/delete/{id}', 'forceDelete');
   });
 
 // Route::apiResource('variation', VariationController::class)->middleware('auth:sanctum');
@@ -131,4 +143,18 @@ Route::controller(VariationController::class)
     Route::delete('/destroy/{id}', 'destroy');
     Route::post('/restore/{id}', 'restore');
     Route::delete('/delete/{id}', 'forceDelete');
+  });
+
+Route::get('/v1/banner', [BannerController::class, 'index']);
+Route::controller(BannerController::class)
+  ->prefix('v1/banner')
+  // ->middleware('auth:sanctum')
+  ->group(function () {
+    Route::post('/store', 'store');
+    Route::get('/show/{id}', 'show');
+    Route::post('/update/{id}', 'update');
+    Route::delete('/destroy/{id}', 'destroy');
+    Route::post('/restore/{id}', 'restore');
+    Route::delete('/delete/{id}', 'forceDelete');
+    Route::post('/status/update/{id}', 'statusUpdate');
   });
