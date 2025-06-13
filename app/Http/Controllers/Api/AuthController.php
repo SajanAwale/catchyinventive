@@ -52,7 +52,7 @@ class AuthController extends Controller
             ], 200);
 
             // return response()->json(['message' => 'User registered successfully!']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 // 'message' => 'Error occurred while registering admin user',
                 'error' => $e->getMessage()
@@ -63,6 +63,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
+            // dd(1);
             $request->validate([
                 'email' => 'required|email|exists:users,email',
                 'password' => 'required|string|min:8',
@@ -95,7 +96,7 @@ class AuthController extends Controller
                 'roles' => $roles,
                 'auth_token' => $token,
             ]); // Secure, HttpOnly, SameSite=Lax
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle exception (e.g., if the token is invalid or expired)
             return response()->json(['error' => 'Unauthorized'], 500);
         }
@@ -137,7 +138,7 @@ class AuthController extends Controller
                 ],
                 'roles' => $roles
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle exception (e.g., if the token is invalid or expired)
             return response()->json(['error' => 'Unauthorized'], 401);
         }
