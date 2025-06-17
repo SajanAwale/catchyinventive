@@ -221,4 +221,28 @@ class ProductsController extends Controller
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->query('keyword');
+
+        if (!$keyword) {
+            return response()->json(['error' => 'Keyword is required.'], 400);
+        }
+
+        $products = Products::where('name', 'LIKE', "%{$keyword}%")->get();
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'message' => 'No products found matching the keyword.',
+                'products' => [],
+                'count' => 0,
+            ], 404); // Optional: Use 200 if you prefer
+        }
+
+        return response()->json([
+            'products' => $products,
+            'count' => $products->count(),
+        ],200);
+    }
 }
