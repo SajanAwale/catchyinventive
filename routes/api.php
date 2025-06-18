@@ -125,6 +125,7 @@ Route::controller(ProductCategoriesController::class)
     // Route::delete('/delete/subcategory/{id}', 'forceDelete');
   });
 
+Route::get('/v1/products/search', [ProductsController::class, 'search']);
 Route::controller(ProductsController::class)
   ->middleware('auth:sanctum')
   ->prefix('v1/products')
