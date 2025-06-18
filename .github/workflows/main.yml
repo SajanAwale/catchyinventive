@@ -2,21 +2,45 @@ on:
   push:
     branches:
       - main
-name: 🚀 Deploy main api on push
+
+name: 🚀 Deploy Laravel app on push
 
 jobs:
   web-deploy:
-    name: 🎉 Main Deploy
+    name: 🎉 Deploy to Production Server
     runs-on: ubuntu-latest
+
     steps:
-      - name: 🚚 Get latest code
+      - name: 🚚 Checkout latest code
         uses: actions/checkout@v3
-        
-      - name: 📂 Sync files
+
+      - name: 📂 Sync files to production server
         uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
           server: ${{ secrets.PROD_HOSTNAME }}
           username: ${{ secrets.PROD_USERNAME }}
           password: ${{ secrets.PROD_PASSWORD }}
           local-dir: ./
-          exclude: "[**/.git*/**, **/node_modules/**, **/src/logs/**]"
+          exclude: |
+            **/.git*/**
+            **/node_modules/**
+            **/vendor/**
+            .env
+            .env.*
+            .gitignore
+            .gitattributes
+            .editorconfig
+            .php-cs-fixer.dist.php
+            phpunit.xml
+            tests/**
+            storage/logs/**
+            storage/framework/cache/**
+            storage/framework/sessions/**
+            storage/framework/views/**
+            README.md
+            composer.lock
+            package.json
+            package-lock.json
+            yarn.lock
+            vite.config.js
+            webpack.mix.js
