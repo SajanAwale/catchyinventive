@@ -104,44 +104,53 @@ class AuthController extends Controller
 
     public function whoAmI(Request $request)
     {
-        // Retrieve token from cookie (just for debugging purpose)
-        $token = $request->cookie('auth_token');
-        // dd($token); // Uncomment if you need to check the token value
-
-        if (!$token) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
         try {
-            // Automatically authenticate using Sanctum
-            $user = $request->user(); // Or auth()->user() - this will get the authenticated user
+            // dd(1);
+            $user = Auth::user()->id;
 
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
+            } else {
+                $userInfo = User::select('id', 'name', 'email', 'created_at', 'updated_at', 'is_active')
+                    ->where('id', $user)
+                    ->first();
+
+                return response()->json($userInfo);
             }
 
-            // Format role information
-            $roles = $user->roles->map(function ($role) {
-                return [
-                    'id' => $role->id,
-                    'name' => $role->name
-                ];
-            });
 
-            // Return response with user and roles
-            return response()->json([
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'email_verified_at' => $user->email_verified_at,
-                ],
-                'roles' => $roles
-            ]);
         } catch (Exception $e) {
-            // Handle exception (e.g., if the token is invalid or expired)
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+        // $user = Auth::user();
+        // try {
+        //     // Automatically authenticate using Sanctum
+        //     $user = $request->user(); // Or auth()->user() - this will get the authenticated user
+
+        //     if (!$user) {
+        //         return response()->json(['error' => 'Unauthorized'], 401);
+        //     }
+        //     // Format role information
+        //     $roles = $user->roles->map(function ($role) {
+        //         return [
+        //             'id' => $role->id,
+        //             'name' => $role->name
+        //         ];
+        //     });
+        //     // Return response with user and roles
+        //     return response()->json([
+        //         'user' => [
+        //             'id' => $user->id,
+        //             'name' => $user->name,
+        //             'email' => $user->email,
+        //             'email_verified_at' => $user->email_verified_at,
+        //         ],
+        //         'roles' => $roles
+        //     ]);
+        // } catch (Exception $e) {
+        //     // Handle exception (e.g., if the token is invalid or expired)
+        //     return response()->json(['error' => 'Unauthorized'], 401);
+        // }
     }
 
     public function logout(Request $request)

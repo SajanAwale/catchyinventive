@@ -22,7 +22,7 @@ class ProductsController extends Controller
             return response()->json([
                 'message' => 'Product fetch successfully.',
                 'data' => $products,
-                'status' => 200,
+                'status' => 200, 
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);

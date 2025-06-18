@@ -66,7 +66,9 @@ class BrandController extends Controller
                 ]);
                 // size validation thumbnail and resize
                 $image_path = $request->file('image');
+
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
+                
                 $filePath = 'brand/' . $fileName;
                 // Store the file in storage file path
                 Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
