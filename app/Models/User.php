@@ -43,6 +43,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = ['role'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -59,5 +61,14 @@ class User extends Authenticatable
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_role_pivot', 'user_id', 'role_id');
+    }
+
+    public function getRoleAttribute()
+    {
+        $role = $this->roles()->select('id', 'name')->first();
+        return $role ? [
+            // 'id' => $role->id,
+            'name' => $role->name,
+        ] : null;
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VariationController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\DashboardController;
 use Illuminate\Support\Facades\Log;
 
 Route::get('/debug', function () {
@@ -63,6 +64,12 @@ Route::controller(AuthController::class)
     });
   });
 
+Route::controller(DashboardController::class)
+->middleware('auth:sanctum')
+->prefix('v1/dashboard')
+->group(function(){
+  Route::get('/count', 'dashboardCount');
+});
 Route::controller(UserController::class)
   ->middleware('auth:sanctum')
   ->prefix('v1/users')
@@ -118,6 +125,7 @@ Route::controller(ProductCategoriesController::class)
     // Route::delete('/delete/subcategory/{id}', 'forceDelete');
   });
 
+Route::get('/v1/products/search', [ProductsController::class, 'search']);
 Route::controller(ProductsController::class)
   ->middleware('auth:sanctum')
   ->prefix('v1/products')
@@ -146,6 +154,7 @@ Route::controller(VariationController::class)
   });
 
 Route::get('/v1/banner', [BannerController::class, 'index']);
+
 Route::controller(BannerController::class)
   ->prefix('v1/banner')
   // ->middleware('auth:sanctum')

@@ -66,6 +66,7 @@ class BrandController extends Controller
                 ]);
                 // size validation thumbnail and resize
                 $image_path = $request->file('image');
+
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
                 $folderPath = 'brand';
                 $filePath = $folderPath. '/' . $fileName;

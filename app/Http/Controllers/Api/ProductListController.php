@@ -24,7 +24,7 @@ class ProductListController extends Controller
                 ->get();
             return response()->json([
                 'message' => 'Category fetch successfully.',
-                'data'    => $categories,
+                'data' => $categories,
                 'status' => 200,
             ], 200);
         } catch (\Exception $e) {
@@ -35,7 +35,7 @@ class ProductListController extends Controller
     public function showAllProducts()
     {
         try {
-            $products = Products::with('category', 'productItem')
+            $products = Products::with('subCategory.parentCategory', 'productItem:id,product_id,count,discount_percent,qty_on_stock,sku,selling_price,created_at,updated_at')
                 ->get();
             return response()->json([
                 'message' => 'All products fetch successfully.',

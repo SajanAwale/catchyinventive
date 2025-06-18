@@ -18,11 +18,11 @@ class ProductsController extends Controller
     public function index()
     {
         try {
-            $products = Products::with('subCategory.parentCategory','productItem')->get();
+            $products = Products::with('subCategory.parentCategory', 'productItem')->get();
             return response()->json([
                 'message' => 'Product fetch successfully.',
                 'data' => $products,
-                'status' => 200,
+                'status' => 200, 
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
@@ -90,7 +90,7 @@ class ProductsController extends Controller
                 'cost_price' => $validated['cost_price'],
                 'selling_price' => $validated['selling_price'],
                 'discount_percent' => $validated['discount_percentage'] ?? 0,
-                'count' => (int)1,
+                'count' => (int) 1,
                 'created_at' => Carbon::now(),
             ]);
 
@@ -133,8 +133,8 @@ class ProductsController extends Controller
     {
         try {
             $products = Products::with('subCategory.parentCategory', 'productItem')
-                                ->where('id', $product_id)
-                                ->findOrFail($product_id);
+                ->where('id', $product_id)
+                ->findOrFail($product_id);
 
             return response()->json([
                 'message' => 'Product fetch successfully.',
@@ -172,7 +172,7 @@ class ProductsController extends Controller
                 Storage::disk('public')->putFileAs('product', $image_path, $fileName);
 
                 // Set image path in the database
-                $productsInfo  = $filePath;
+                $productsInfo = $filePath;
             } else {
                 $productsInfo = $products->product_image;
             }
@@ -188,12 +188,12 @@ class ProductsController extends Controller
                         'updated_at' => Carbon::now()
                     ]);
                 $productItem = ProductItems::where('product_id', $id)->update([
-                        'qty_on_stock' => $request->qty_in_stock,
-                        'cost_price' => $request->cost_price,
-                        'selling_price' => $request->selling_price,
-                        'discount_percent' => $request->discount_percentage ?? 0,
-                        'count' =>(int)$request->count + 1,
-                        'updated_at' => Carbon::now(),
+                    'qty_on_stock' => $request->qty_in_stock,
+                    'cost_price' => $request->cost_price,
+                    'selling_price' => $request->selling_price,
+                    'discount_percent' => $request->discount_percentage ?? 0,
+                    'count' => (int) $request->count + 1,
+                    'updated_at' => Carbon::now(),
                 ]);
                 return response()->json([
                     'message' => 'Product updated successfully.',
@@ -225,5 +225,29 @@ class ProductsController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch products.', 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->query('keyword');
+
+        if (!$keyword) {
+            return response()->json(['error' => 'Keyword is required.'], 400);
+        }
+
+        $products = Products::where('name', 'LIKE', "%{$keyword}%")->get();
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'message' => 'No products found matching the keyword.',
+                'products' => [],
+                'count' => 0,
+            ], 404); // Optional: Use 200 if you prefer
+        }
+
+        return response()->json([
+            'products' => $products,
+            'count' => $products->count(),
+        ],200);
     }
 }
