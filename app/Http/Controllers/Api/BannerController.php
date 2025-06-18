@@ -5,15 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorebrandRequest;
 use App\Http\Requests\UpdatebrandRequest;
-use App\Models\Brand;
+use App\Models\Banner;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
+use Illuminate\Support\Str;
 
-class BrandController extends Controller
+class BannerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,15 +21,15 @@ class BrandController extends Controller
     public function index()
     {
         try {
-            $brands = Brand::withTrashed()->get();
+            $banners = Banner::withTrashed()->get();
             return response()->json([
-                'message' => 'Brand fetch successfully.',
-                'data' => $brands,
+                'message' => 'Banner fetch successfully.',
+                'data' => $banners,
                 'status' => 200,
 
             ], 200);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Failed to fetch brands.', 'message' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to fetch banners.', 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -40,23 +40,20 @@ class BrandController extends Controller
     {
         try {
             $validator = $request->validate([
-                'name' => 'required|string',
-                'slug' => 'required|unique:brands,slug',
+                'title' => 'required|string',
                 'description' => 'required|string',
+                'permalink' => 'required|string',
             ]);
             // $user_id = Auth::user()->id;
-            $brand = Brand::get();
-            $brandOrder = $brand->count() + 1;
+            $banner = Banner::get();
+            $bannerOrder = $banner->count() + 1;
 
-            $brand = Brand::create([
-                'name' => $request->name,
-                // 'slug' => St::slug($request->name),
-                'slug' => $request->slug,
+            $banner = Banner::create([
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
                 'description' => $request->description,
-                'permalink' => $request->permalink,
-                'is_featured' => $request->is_featured ?? 1, // 1 is false where 0 is true
-                'status' => $request->status ?? 0,
-                'sort_order' => $brandOrder,
+                'price' => $request->price,
+                'sort_order' => $bannerOrder,
                 'created_at' => now(),
             ]);
 
@@ -66,29 +63,22 @@ class BrandController extends Controller
                 ]);
                 // size validation thumbnail and resize
                 $image_path = $request->file('image');
-
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
-                $folderPath = 'brand';
-                $filePath = $folderPath. '/' . $fileName;
-
-                // Check if the folder exists, and if not create it
-                if (!Storage::disk('public')->exists($folderPath)) {
-                    Storage::disk('public')->makeDirectory($folderPath);
-                }
+                $filePath = 'banner/' . $fileName;
                 // Store the file in storage file path
-                Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
+                Storage::disk('public')->putFileAs('banner', $image_path, $fileName);
                 // Set image path in the database
-                $brand->image = $filePath;
+                $banner->image = $filePath;
             }
-            $brand->save();
+            $banner->save();
 
             return response()->json([
-                'message' => 'Brand created sucessfully.',
-                'data'    => $brand,
+                'message' => 'Banner created sucessfully.',
+                'data'    => $banner,
                 'status' => 200,
             ], 200);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Failed to create product.', 'message' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to create banner.', 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -98,15 +88,15 @@ class BrandController extends Controller
     public function show($id)
     {
         try {
-            $brand = Brand::find($id);
-            if ($brand) {
+            $banner = Banner::find($id);
+            if ($banner) {
                 return response()->json([
-                    'message' => 'Brand fetch successfully.',
-                    'data'    => $brand,
+                    'message' => 'Banner fetch successfully.',
+                    'data'    => $banner,
                     'status' => 200,
                 ], 200);
             } else {
-                return response()->json(['error' => 'Brand not found.'], 404);
+                return response()->json(['error' => 'Banner not found.'], 404);
             }
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to fetch product.', 'message' => $e->getMessage()], 500);
@@ -120,51 +110,46 @@ class BrandController extends Controller
     {
         try {
             $validator = $request->validate([
-                'name' => 'required|string',
+                'title' => 'required|string',
                 'description' => 'required|string',
+                'permalink' => 'required|string',
             ]);
 
-            $brand = Brand::findorFail($id);
+            $banner = Banner::findorFail($id);
 
             // Checking if the request has image file path with update in path 
             // new image is uploaded and path is updated
             if ($request->image != null) {
-                $request->validate([
-                    'image' => 'image|mimes:jpeg,png,jpg'
-                ]);
-
                 $image_path = $request->file('image');
                 $fileName = time() . '_' . $image_path->getClientOriginalName();
-                $filePath = 'brand/' . $fileName;
+                $filePath = 'banner/' . $fileName;
                 // Store the file in storage file path
-                Storage::disk('public')->putFileAs('brand', $image_path, $fileName);
+                Storage::disk('public')->putFileAs('banner', $image_path, $fileName);
                 // Set image path in the database
-                $brandImage = $filePath;
+                $bannerImage = $filePath;
             } else {
-                $brandImage = $brand->image;
+                $bannerImage = $banner->image;
             }
 
-            if ($brand) {
-                $brand = Brand::where('id', $id)->update([
-                    'name' => $request->name,
-                    // 'slug' => Str::slug($request->name),
-                    'slug' => $request->slug,
+            if ($banner) {
+                $banner = Banner::where('id', $id)->update([
+                    'title' => $request->title,
+                    'slug' => Str::slug($request->title),
                     'description' => $request->description,
                     'permalink' => $request->permalink,
-                    'description' => $request->description,
-                    'is_featured' => $request->is_featured ?? 1,
-                    'status' => $request->status ?? 0,
-                    'sort_order' => $brand->sort_order,
-                    'image' => $brandImage,
+                    'price' => $request->price,
+                    'status' => $request->status ?? $banner->status,
+                    'sort_order' => $banner->sort_order,
+                    'image' => $bannerImage,
                     'updated_at' => now(),
                 ]);
                 return response()->json([
-                    'message' => 'Brand updated successfully.',
-                    'data'    => $brand,
+                    'message' => 'Banner updated successfully.',
+                    'data'    => $banner,
                     'status' => 200,
                 ], 200);
             } else {
-                return response()->json(['error' => 'Brand not found.'], 404);
+                return response()->json(['error' => 'Banner not found.'], 404);
             }
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to update product.', 'message' => $e->getMessage()], 500);
@@ -177,10 +162,10 @@ class BrandController extends Controller
     public function destroy($id)
     {
         try {
-            $brand = Brand::find($id)->delete();
+            $banner = Banner::find($id)->delete();
             return response()->json([
                 'message' => 'Brand deleted successfully.',
-                'data'    => $brand,
+                'data'    => $banner,
                 'status' => 200,
             ], 200);
         } catch (Exception $e) {

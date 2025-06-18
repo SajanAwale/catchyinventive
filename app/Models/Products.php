@@ -22,15 +22,21 @@ class Products extends Model
         'deleted_at',
     ];
     protected $casts = [
-        'category_id'=> 'integer',
-        'name'=> 'string',
-        'description'=> 'string',
-        'product_image'=> 'string',
+        'category_id' => 'integer',
+        'name' => 'string',
+        'description' => 'string',
+        'product_image' => 'string',
 
     ];
 
-    public function category()
+    public function subCategory()
     {
         return $this->belongsTo(ProductCategories::class, 'category_id');
     }
+
+    public function productItem(){
+        return $this->hasOne(ProductItems::class, 'product_id', 'id');
+    }
+
+    
 }
