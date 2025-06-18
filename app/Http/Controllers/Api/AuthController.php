@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserRolePivot;
+use App\Models\UserDetails;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +42,10 @@ class AuthController extends Controller
             $rolePivot = UserRolePivot::insert([
                 'user_id' => $user->id,
                 'role_id' => $request['role_id'] ?? 1
+            ]);
+
+            $userDetails = UserDetails::create([
+                'user_id' => $user->id
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
