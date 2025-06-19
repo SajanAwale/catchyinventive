@@ -151,7 +151,6 @@ class BrandController extends Controller
                     'slug' => $request->slug,
                     'description' => $request->description,
                     'permalink' => $request->permalink,
-                    'description' => $request->description,
                     'is_featured' => $request->is_featured ?? 1,
                     'status' => $request->status ?? 0,
                     'sort_order' => $brand->sort_order,
