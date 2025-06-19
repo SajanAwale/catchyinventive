@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - deploy-branch
 
 name: 🚀 Deploy Laravel app on push
 
@@ -21,26 +21,3 @@ jobs:
           username: ${{ secrets.PROD_USERNAME }}
           password: ${{ secrets.PROD_PASSWORD }}
           local-dir: ./
-          exclude: |
-            **/.git*/**
-            **/node_modules/**
-            **/vendor/**
-            .env
-            .env.*
-            .gitignore
-            .gitattributes
-            .editorconfig
-            .php-cs-fixer.dist.php
-            phpunit.xml
-            tests/**
-            storage/logs/**
-            storage/framework/cache/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            README.md
-            composer.lock
-            package.json
-            package-lock.json
-            yarn.lock
-            vite.config.js
-            webpack.mix.js

@@ -1,5 +1,4 @@
 # Laravel-specific files
-/vendor/
 /node_modules/
 
 /public/storage
@@ -43,5 +42,4 @@ pnpm-debug.log*
 Homestead.json
 Homestead.yaml
 .env.example.backup
-/vendor
 
