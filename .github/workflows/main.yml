@@ -17,30 +17,8 @@ jobs:
       - name: 📂 Sync files to production server
         uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
-          server: ${{ secrets.PROD_HOSTNAME }}
-          username: ${{ secrets.PROD_USERNAME }}
-          password: ${{ secrets.PROD_PASSWORD }}
-          local-dir: ./
-          exclude: |
-            **/.git*/**
-            **/node_modules/**
-            **/vendor/**
-            .env
-            .env.*
-            .gitignore
-            .gitattributes
-            .editorconfig
-            .php-cs-fixer.dist.php
-            phpunit.xml
-            tests/**
-            storage/logs/**
-            storage/framework/cache/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            README.md
-            composer.lock
-            package.json
-            package-lock.json
-            yarn.lock
-            vite.config.js
-            webpack.mix.js
+          server:  ftp.pavilionsolution.com.np
+          username:  bidhya@api.pavilionsolution.com.np
+          password:  Bidhya@@1@@
+          local-dir:  ./
+          server-dir: /home/pavilion/api.pavilionsolution.com.np
