@@ -119,11 +119,12 @@ class AuthController extends Controller
                 $userInfo = User::select('id', 'name', 'email', 'created_at', 'updated_at', 'is_active')
                     ->where('id', $user)
                     ->first();
-
-                return response()->json($userInfo);
+                return response()->json([
+                    'message' => 'User Info fetch successfully.',
+                    'data'    => $userInfo,
+                    'status' => 200,
+                ], 200);
             }
-
-
         } catch (Exception $e) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
