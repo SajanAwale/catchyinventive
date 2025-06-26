@@ -21,4 +21,4 @@ jobs:
           username:  bidhya@api.pavilionsolution.com.np
           password:  Bidhya@@1@@
           local-dir:  ./
-          server-dir: /home/pavilion/api.pavilionsolution.com.np
+          server-dir: /home/pavilion/api.pavilionsolution.com.np/
